@@ -1,7 +1,9 @@
 using FluentAssertions;
 using NUnit.Framework;
 using PointOfSale;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnitTests
 {
@@ -178,5 +180,35 @@ namespace UnitTests
             // Assert
             result.Should().Be(6);
         }
+
+        [TestCaseSource(nameof(InvalidProductLists))]
+        public void SetPricing_should_throw_when_product_list_is_null_or_empty(IEnumerable<Product> productList)
+        {
+            // Act && Assert
+            Action action = () => _sut.SetPricing(productList, null);
+            action.Should().Throw<ArgumentException>().WithMessage("There should be atleast 1 product for terminal to operate. (Parameter 'products')");
+        }
+
+        [Test]
+        public void SetPricing_should_throw_when_product_list_contains_propducts_with_same_product_code()
+        {
+            // Arrange
+            var duplicateProductCode = "C";
+            var productList = new List<Product>
+            {
+                new Product(duplicateProductCode, 1m),
+                new Product(duplicateProductCode, 2m),
+            };
+
+            // Act && Assert
+            Action action = () => _sut.SetPricing(productList, null);
+            action.Should().Throw<ArgumentException>().WithMessage($"An item with the same key has already been added. Key: {duplicateProductCode}");
+        }
+
+        static IEnumerable<Product>[] InvalidProductLists =
+        {
+            null,
+            Enumerable.Empty<Product>(),
+        };
     }
 }
