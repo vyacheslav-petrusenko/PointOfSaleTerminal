@@ -205,6 +205,31 @@ namespace UnitTests
             action.Should().Throw<ArgumentException>().WithMessage($"An item with the same key has already been added. Key: {duplicateProductCode}");
         }
 
+        [Test]
+        public void Calculate_should_return_correct_value_when_multiple_sessions_are_executed()
+        {
+            // Arrange && Act
+            _sut.Scan("A");
+            _sut.Scan("B");
+            _sut.Scan("C");
+            _sut.Scan("D");
+            var result1 = _sut.CalculateTotal();
+
+            _sut.ClearCheque();
+
+            _sut.Scan("C");
+            _sut.Scan("C");
+            _sut.Scan("C");
+            _sut.Scan("C");
+            _sut.Scan("C");
+            _sut.Scan("C");
+            var result2 = _sut.CalculateTotal();
+
+            // Assert
+            result1.Should().Be(7.25m);
+            result2.Should().Be(5m);
+        }
+
         static IEnumerable<Product>[] InvalidProductLists =
         {
             null,

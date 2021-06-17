@@ -60,5 +60,10 @@ namespace PointOfSale
 
             return total;
         }
+
+        public void ClearCheque()
+        {
+            _cheque = new Dictionary<Product, int>();
+        }
     }
 }
